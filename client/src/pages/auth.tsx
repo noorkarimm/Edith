@@ -14,37 +14,39 @@ export default function AuthPage() {
         <h1 className="text-3xl font-bold text-black">EDITH</h1>
       </div>
 
-      {/* Auth Container - Equal padding on both sides */}
+      {/* Auth Container - Equal padding on both sides with centered content */}
       <div className="w-full max-w-lg">
-        <div className="bg-white/95 backdrop-blur-md rounded-xl border border-white/30 px-16 py-8">
+        <div className="bg-white/95 backdrop-blur-md rounded-xl border border-white/30 px-16 py-8 flex flex-col items-center justify-center">
           {isSignUp ? (
-            <div className="space-y-6">
+            <div className="space-y-6 w-full">
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
                 <p className="text-gray-600 mt-2">Join EDITH to get started</p>
               </div>
               
-              <SignUp 
-                appearance={{
-                  elements: {
-                    formButtonPrimary: 
-                      "bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-colors",
-                    card: "shadow-none border-none bg-transparent",
-                    headerTitle: "hidden",
-                    headerSubtitle: "hidden",
-                    socialButtonsBlockButton: 
-                      "border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors",
-                    formFieldInput: 
-                      "border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-black focus:border-black",
-                    footerActionLink: "text-black hover:text-gray-700",
-                    footer: "shadow-none",
-                    footerAction: "shadow-none",
-                    footerActionText: "shadow-none",
-                    footerPages: "shadow-none"
-                  }
-                }}
-                redirectUrl="/"
-              />
+              <div className="flex justify-center">
+                <SignUp 
+                  appearance={{
+                    elements: {
+                      formButtonPrimary: 
+                        "bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-colors",
+                      card: "shadow-none border-none bg-transparent",
+                      headerTitle: "hidden",
+                      headerSubtitle: "hidden",
+                      socialButtonsBlockButton: 
+                        "border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors",
+                      formFieldInput: 
+                        "border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-black focus:border-black",
+                      footerActionLink: "text-black hover:text-gray-700",
+                      footer: "shadow-none",
+                      footerAction: "shadow-none",
+                      footerActionText: "shadow-none",
+                      footerPages: "shadow-none"
+                    }
+                  }}
+                  redirectUrl="/"
+                />
+              </div>
               
               <div className="text-center">
                 <button
@@ -56,33 +58,35 @@ export default function AuthPage() {
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-6 w-full">
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
                 <p className="text-gray-600 mt-2">Sign in to continue to EDITH</p>
               </div>
               
-              <SignIn 
-                appearance={{
-                  elements: {
-                    formButtonPrimary: 
-                      "bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-colors",
-                    card: "shadow-none border-none bg-transparent",
-                    headerTitle: "hidden",
-                    headerSubtitle: "hidden",
-                    socialButtonsBlockButton: 
-                      "border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors",
-                    formFieldInput: 
-                      "border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-black focus:border-black",
-                    footerActionLink: "text-black hover:text-gray-700",
-                    footer: "shadow-none",
-                    footerAction: "shadow-none",
-                    footerActionText: "shadow-none",
-                    footerPages: "shadow-none"
-                  }
-                }}
-                redirectUrl="/"
-              />
+              <div className="flex justify-center">
+                <SignIn 
+                  appearance={{
+                    elements: {
+                      formButtonPrimary: 
+                        "bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-colors",
+                      card: "shadow-none border-none bg-transparent",
+                      headerTitle: "hidden",
+                      headerSubtitle: "hidden",
+                      socialButtonsBlockButton: 
+                        "border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors",
+                      formFieldInput: 
+                        "border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-black focus:border-black",
+                      footerActionLink: "text-black hover:text-gray-700",
+                      footer: "shadow-none",
+                      footerAction: "shadow-none",
+                      footerActionText: "shadow-none",
+                      footerPages: "shadow-none"
+                    }
+                  }}
+                  redirectUrl="/"
+                />
+              </div>
               
               <div className="text-center">
                 <button
