@@ -25,7 +25,7 @@ export default defineConfig({
       "@assets": path.resolve(__dirname, "attached_assets"),
     },
   },
-  root: path.resolve(__dirname, "client"),
+  root: __dirname,
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
@@ -39,8 +39,6 @@ export default defineConfig({
         path.resolve(__dirname, "shared"),
       ],
     },
-    hmr: false,
-    ws: false,
     host: "0.0.0.0",
     port: 5173,
     watch: {
@@ -50,7 +48,6 @@ export default defineConfig({
   },
   define: {
     __VITE_IS_MODERN__: false,
-    __VITE_HMR__: false,
   },
   optimizeDeps: {
     exclude: ['vite/client']
