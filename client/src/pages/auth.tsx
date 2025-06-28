@@ -20,8 +20,8 @@ export default function AuthPage() {
           {isSignUp ? (
             <div className="space-y-6 w-full">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-white">Create Account</h2>
-                <p className="text-white/80 mt-2">Join EDITH to get started</p>
+                <h2 className="text-2xl font-bold text-black">Create Account</h2>
+                <p className="text-black/80 mt-2">Join EDITH to get started</p>
               </div>
               
               <div className="flex justify-center">
@@ -34,17 +34,17 @@ export default function AuthPage() {
                       headerTitle: "hidden",
                       headerSubtitle: "hidden",
                       socialButtonsBlockButton: 
-                        "border border-white/30 hover:bg-white/10 text-white font-medium py-2 px-4 rounded-lg transition-colors backdrop-blur-sm",
+                        "border border-white/30 hover:bg-white/10 text-black font-medium py-2 px-4 rounded-lg transition-colors backdrop-blur-sm",
                       formFieldInput: 
-                        "border border-white/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-white/50 focus:border-white/50 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60",
-                      footerActionLink: "text-white hover:text-white/80",
+                        "border border-white/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-white/50 focus:border-white/50 bg-white/10 backdrop-blur-sm text-black placeholder:text-black/60",
+                      footerActionLink: "text-black hover:text-black/80",
                       footer: "shadow-none",
                       footerAction: "shadow-none",
                       footerActionText: "shadow-none",
                       footerPages: "shadow-none",
-                      formFieldLabel: "text-white/90",
-                      identityPreviewText: "text-white/80",
-                      identityPreviewEditButton: "text-white/80 hover:text-white"
+                      formFieldLabel: "text-black/90",
+                      identityPreviewText: "text-black/80",
+                      identityPreviewEditButton: "text-black/80 hover:text-black"
                     }
                   }}
                   redirectUrl="/"
@@ -54,7 +54,7 @@ export default function AuthPage() {
               <div className="text-center">
                 <button
                   onClick={() => setIsSignUp(false)}
-                  className="text-white hover:text-white/80 font-medium"
+                  className="text-black hover:text-black/80 font-medium"
                 >
                   Already have an account? Sign in
                 </button>
@@ -63,8 +63,8 @@ export default function AuthPage() {
           ) : (
             <div className="space-y-6 w-full">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-white">Welcome Back</h2>
-                <p className="text-white/80 mt-2">Sign in to continue to EDITH</p>
+                <h2 className="text-2xl font-bold text-black">Welcome Back</h2>
+                <p className="text-black/80 mt-2">Sign in to continue to EDITH</p>
               </div>
               
               <div className="flex justify-center">
@@ -77,17 +77,17 @@ export default function AuthPage() {
                       headerTitle: "hidden",
                       headerSubtitle: "hidden",
                       socialButtonsBlockButton: 
-                        "border border-white/30 hover:bg-white/10 text-white font-medium py-2 px-4 rounded-lg transition-colors backdrop-blur-sm",
+                        "border border-white/30 hover:bg-white/10 text-black font-medium py-2 px-4 rounded-lg transition-colors backdrop-blur-sm",
                       formFieldInput: 
-                        "border border-white/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-white/50 focus:border-white/50 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60",
-                      footerActionLink: "text-white hover:text-white/80",
+                        "border border-white/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-white/50 focus:border-white/50 bg-white/10 backdrop-blur-sm text-black placeholder:text-black/60",
+                      footerActionLink: "text-black hover:text-black/80",
                       footer: "shadow-none",
                       footerAction: "shadow-none",
                       footerActionText: "shadow-none",
                       footerPages: "shadow-none",
-                      formFieldLabel: "text-white/90",
-                      identityPreviewText: "text-white/80",
-                      identityPreviewEditButton: "text-white/80 hover:text-white"
+                      formFieldLabel: "text-black/90",
+                      identityPreviewText: "text-black/80",
+                      identityPreviewEditButton: "text-black/80 hover:text-black"
                     }
                   }}
                   redirectUrl="/"
@@ -97,7 +97,7 @@ export default function AuthPage() {
               <div className="text-center">
                 <button
                   onClick={() => setIsSignUp(true)}
-                  className="text-white hover:text-white/80 font-medium"
+                  className="text-black hover:text-black/80 font-medium"
                 >
                   Don't have an account? Sign up
                 </button>
