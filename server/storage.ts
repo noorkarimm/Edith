@@ -6,11 +6,11 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getConversation(id: string): Promise<ConversationState | undefined>;
   saveConversation(conversation: ConversationState): Promise<ConversationState>;
-  getAllConversations(userId?: string): Promise<ConversationState[]>;
+  getAllConversations(): Promise<ConversationState[]>;
   deleteConversation(id: string): Promise<boolean>;
   createDocument(document: InsertDocument): Promise<Document>;
   getDocument(id: string): Promise<Document | undefined>;
-  getAllDocuments(userId?: string): Promise<Document[]>;
+  getAllDocuments(): Promise<Document[]>;
   updateDocument(id: string, updates: Partial<InsertDocument>): Promise<Document | undefined>;
   deleteDocument(id: string): Promise<boolean>;
 }
@@ -56,13 +56,8 @@ export class MemStorage implements IStorage {
     return conversation;
   }
 
-  async getAllConversations(userId?: string): Promise<ConversationState[]> {
-    let conversations = Array.from(this.conversations.values());
-    
-    // Filter by user if provided
-    if (userId) {
-      conversations = conversations.filter(conv => conv.userId === userId);
-    }
+  async getAllConversations(): Promise<ConversationState[]> {
+    const conversations = Array.from(this.conversations.values());
     
     return conversations.sort((a, b) => {
       // Sort by most recent activity (last message timestamp)
@@ -105,13 +100,8 @@ export class MemStorage implements IStorage {
     return this.documents.get(id);
   }
 
-  async getAllDocuments(userId?: string): Promise<Document[]> {
-    let documents = Array.from(this.documents.values());
-    
-    // Filter by user if provided
-    if (userId) {
-      documents = documents.filter(doc => doc.userId === userId);
-    }
+  async getAllDocuments(): Promise<Document[]> {
+    const documents = Array.from(this.documents.values());
     
     return documents.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()); // Most recently updated first
   }
