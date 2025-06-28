@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { conversationSchema, documentSchema, type ConversationState } from "@shared/schema";
 import { generateConversationalResponse, craftSuperPrompt } from "./services/openai";
-import { requireAuth, getUser } from "./middleware/auth";
 import { z } from "zod";
 
 const superPromptSchema = z.object({
@@ -12,13 +11,13 @@ const superPromptSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check endpoint (no auth required)
+  // Health check endpoint
   app.get("/api/health", (req, res) => {
     res.json({ success: true, message: "API is working" });
   });
 
-  // Craft Super Prompt endpoint - requires auth
-  app.post("/api/craft-super-prompt", requireAuth, async (req, res) => {
+  // Craft Super Prompt endpoint
+  app.post("/api/craft-super-prompt", async (req, res) => {
     try {
       const { prompt, model } = superPromptSchema.parse(req.body);
       
@@ -37,11 +36,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // General AI chat endpoint - requires auth
-  app.post("/api/chat", requireAuth, async (req, res) => {
+  // General AI chat endpoint
+  app.post("/api/chat", async (req, res) => {
     try {
       const { message, conversationId, model } = conversationSchema.parse(req.body);
-      const userId = req.auth?.userId; // Get user ID from Supabase
       
       let conversation: ConversationState;
       
@@ -63,7 +61,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           initialDescription: message,
           selectedModel: model,
           conversationHistory: [],
-          userId: userId // Associate with authenticated user
         };
       }
 
@@ -104,8 +101,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get conversation history - requires auth
-  app.get("/api/conversations/:id", requireAuth, async (req, res) => {
+  // Get conversation history
+  app.get("/api/conversations/:id", async (req, res) => {
     try {
       const conversation = await storage.getConversation(req.params.id);
       
@@ -129,14 +126,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all conversations (for history dropdown) - requires auth
-  app.get("/api/conversations", requireAuth, async (req, res) => {
+  // Get all conversations (for history dropdown)
+  app.get("/api/conversations", async (req, res) => {
     try {
-      const userId = req.auth?.userId;
-      console.log('Fetching conversations for user:', userId);
-      
-      const conversations = await storage.getAllConversations(userId);
-      console.log('Found conversations:', conversations.length);
+      const conversations = await storage.getAllConversations();
       
       res.json({
         success: true,
@@ -151,8 +144,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete conversation - requires auth
-  app.delete("/api/conversations/:id", requireAuth, async (req, res) => {
+  // Delete conversation
+  app.delete("/api/conversations/:id", async (req, res) => {
     try {
       const success = await storage.deleteConversation(req.params.id);
       
@@ -176,18 +169,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Document management endpoints - all require auth
+  // Document management endpoints
   
   // Create new document
-  app.post("/api/documents", requireAuth, async (req, res) => {
+  app.post("/api/documents", async (req, res) => {
     try {
       const { title, content } = documentSchema.parse(req.body);
-      const userId = req.auth?.userId;
       
       const document = await storage.createDocument({
         title,
         content: content || "",
-        userId
       });
 
       res.json({
@@ -204,13 +195,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all documents
-  app.get("/api/documents", requireAuth, async (req, res) => {
+  app.get("/api/documents", async (req, res) => {
     try {
-      const userId = req.auth?.userId;
-      console.log('Fetching documents for user:', userId);
-      
-      const documents = await storage.getAllDocuments(userId);
-      console.log('Found documents:', documents.length);
+      const documents = await storage.getAllDocuments();
       
       res.json({
         success: true,
@@ -226,7 +213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get specific document
-  app.get("/api/documents/:id", requireAuth, async (req, res) => {
+  app.get("/api/documents/:id", async (req, res) => {
     try {
       const document = await storage.getDocument(req.params.id);
       
@@ -251,7 +238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update document
-  app.put("/api/documents/:id", requireAuth, async (req, res) => {
+  app.put("/api/documents/:id", async (req, res) => {
     try {
       const { title, content } = documentSchema.parse(req.body);
       
@@ -281,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete document
-  app.delete("/api/documents/:id", requireAuth, async (req, res) => {
+  app.delete("/api/documents/:id", async (req, res) => {
     try {
       const success = await storage.deleteDocument(req.params.id);
       
