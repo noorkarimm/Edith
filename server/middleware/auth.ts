@@ -16,9 +16,45 @@ export const clerkAuth = clerkMiddleware({
   publishableKey: publishableKey
 });
 
-// Middleware to require authentication
+// Middleware to require authentication with JSON error responses
 export const requireAuthentication = (req: Request, res: Response, next: NextFunction) => {
-  requireAuth()(req, res, next);
+  // Check if this is an API route
+  const isApiRoute = req.path.startsWith('/api/');
+  
+  try {
+    requireAuth()(req, res, (error) => {
+      if (error || !req.auth?.userId) {
+        // For API routes, return JSON error instead of redirecting
+        if (isApiRoute) {
+          return res.status(401).json({
+            success: false,
+            error: 'Authentication required',
+            code: 'UNAUTHORIZED'
+          });
+        }
+        // For non-API routes, let the default behavior handle it
+        if (error) {
+          throw error;
+        }
+        return res.status(401).json({
+          success: false,
+          error: 'Authentication required',
+          code: 'UNAUTHORIZED'
+        });
+      }
+      next();
+    });
+  } catch (error) {
+    // Handle any other authentication errors
+    if (isApiRoute) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication failed',
+        code: 'AUTH_ERROR'
+      });
+    }
+    throw error;
+  }
 };
 
 // Middleware to get user info (optional auth)
