@@ -14,9 +14,9 @@ export default function AuthPage() {
         <h1 className="text-3xl font-bold text-black">EDITH</h1>
       </div>
 
-      {/* Auth Container - Increased left padding */}
+      {/* Auth Container - Equal padding on both sides */}
       <div className="w-full max-w-lg">
-        <div className="bg-white/95 backdrop-blur-md rounded-xl border border-white/30 pl-16 pr-12 py-8">
+        <div className="bg-white/95 backdrop-blur-md rounded-xl border border-white/30 px-16 py-8">
           {isSignUp ? (
             <div className="space-y-6">
               <div className="text-center">
