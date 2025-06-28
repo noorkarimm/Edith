@@ -30,20 +30,14 @@ export default defineConfig({
   },
   server: {
     fs: {
-      strict: true,
-      deny: ["**/.*"],
+      strict: false, // Allow access to files outside root
+      allow: [
+        // Allow access to the entire project directory
+        path.resolve(import.meta.dirname),
+      ],
     },
-    hmr: false, // Completely disable HMR
-    ws: false,  // Disable WebSocket server
-    watch: {
-      usePolling: true, // Use polling instead of file system events
-      interval: 1000,
-    },
+    hmr: false, // Disable HMR to avoid WebSocket issues
     host: "0.0.0.0",
     port: 5173,
-  },
-  // Additional configuration to prevent WebSocket connections
-  define: {
-    __VITE_HMR__: false,
   },
 });
