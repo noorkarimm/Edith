@@ -15,6 +15,7 @@ export const conversations = pgTable("conversations", {
   initialDescription: text("initial_description").notNull(),
   selectedModel: text("selected_model").default("gpt-4o"),
   conversationHistory: jsonb("conversation_history").default([]),
+  userId: text("user_id"), // Clerk user ID
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -23,7 +24,7 @@ export const documents = pgTable("documents", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   content: text("content").notNull().default(""),
-  userId: uuid("user_id"),
+  userId: text("user_id"), // Clerk user ID
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -48,6 +49,7 @@ export const conversationSchema = z.object({
 export const documentSchema = z.object({
   title: z.string().min(1, "Please provide a document title"),
   content: z.string().optional().default(""),
+  userId: z.string().optional(),
 });
 
 export const conversationState = z.object({
@@ -66,6 +68,7 @@ export const conversationState = z.object({
     content: z.string(),
     model: aiModelSchema.optional(),
   })).optional(),
+  userId: z.string().optional(), // Clerk user ID
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
@@ -78,6 +81,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertDocumentSchema = createInsertSchema(documents).pick({
   title: true,
   content: true,
+  userId: true,
 });
 
 export const insertConversationSchema = createInsertSchema(conversations);

@@ -7,6 +7,7 @@ import { AnimatedEmailIcon } from "@/components/ui/animated-email-icon";
 import { AnimatedPlusIcon } from "@/components/ui/animated-plus-icon";
 import { ConversationHistoryDropdown } from "@/components/ui/conversation-history-dropdown";
 import { DocumentManagerDropdown } from "@/components/ui/document-manager-dropdown";
+import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
 import { apiRequest } from "@/lib/queryClient";
 import { User } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
@@ -169,6 +170,8 @@ function TypewriterMessage({ message }: { message: ChatMessage }) {
 }
 
 function ChatMessages({ messages }: { messages: ChatMessage[] }) {
+  const { user } = useUser();
+  
   const getModelDisplayName = (model?: AIModel) => {
     switch (model) {
       case 'claude-3-5-sonnet-20241022':
@@ -198,8 +201,16 @@ function ChatMessages({ messages }: { messages: ChatMessage[] }) {
         <div key={index}>
           {message.role === 'user' ? (
             <div className="flex items-start space-x-3 flex-row-reverse space-x-reverse">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border bg-primary/30 border-primary/40">
-                <User className="w-4 h-4 text-primary" />
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border bg-primary/30 border-primary/40 overflow-hidden">
+                {user?.imageUrl ? (
+                  <img 
+                    src={user.imageUrl} 
+                    alt={user.firstName || 'User'} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-4 h-4 text-primary" />
+                )}
               </div>
               <div className="max-w-[85%] p-4 rounded-2xl border shadow-lg bg-primary/20 text-black rounded-tr-md border-primary/30">
                 <div className="text-sm whitespace-pre-wrap leading-relaxed font-medium break-words">
@@ -267,6 +278,7 @@ function ChatMessages({ messages }: { messages: ChatMessage[] }) {
 }
 
 export default function Home() {
+  const { user } = useUser();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState<AIModel>('gpt-4o');
@@ -392,15 +404,31 @@ export default function Home() {
               <h1 className="text-xl font-bold text-black">EDITH</h1>
             </button>
             
-            {messages.length > 0 && (
-              <Button 
-                variant="ghost" 
-                className="text-black hover:bg-white/10 font-medium border border-white/20"
-                onClick={clearChat}
-              >
-                Clear Chat
-              </Button>
-            )}
+            <div className="flex items-center space-x-4">
+              {messages.length > 0 && (
+                <Button 
+                  variant="ghost" 
+                  className="text-black hover:bg-white/10 font-medium border border-white/20"
+                  onClick={clearChat}
+                >
+                  Clear Chat
+                </Button>
+              )}
+              
+              <SignedIn>
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8",
+                      userButtonPopoverCard: "bg-white/95 backdrop-blur-md border border-white/30",
+                      userButtonPopoverActionButton: "hover:bg-black/5",
+                      userButtonPopoverActionButtonText: "text-black",
+                      userButtonPopoverFooter: "hidden"
+                    }
+                  }}
+                />
+              </SignedIn>
+            </div>
           </div>
         </div>
       </header>
@@ -445,6 +473,16 @@ export default function Home() {
         {messages.length === 0 ? (
           /* Welcome Screen */
           <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
+            {/* Welcome Message */}
+            <div className="text-center mb-8">
+              <h2 className="text-4xl font-bold text-black mb-4">
+                Welcome back, {user?.firstName || 'there'}!
+              </h2>
+              <p className="text-xl text-black/70">
+                What would you like to explore today?
+              </p>
+            </div>
+
             {/* AI Prompt Input */}
             <div className="w-full max-w-2xl relative">
               <PromptInputBox

@@ -7,29 +7,29 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getConversation(id: string): Promise<ConversationState | undefined>;
   saveConversation(conversation: ConversationState): Promise<ConversationState>;
-  getAllConversations(): Promise<ConversationState[]>;
+  getAllConversations(userId?: string): Promise<ConversationState[]>;
   deleteConversation(id: string): Promise<boolean>;
   createDocument(document: InsertDocument): Promise<Document>;
   getDocument(id: string): Promise<Document | undefined>;
-  getAllDocuments(): Promise<Document[]>;
+  getAllDocuments(userId?: string): Promise<Document[]>;
   updateDocument(id: string, updates: Partial<InsertDocument>): Promise<Document | undefined>;
   deleteDocument(id: string): Promise<boolean>;
 }
 
 export class SupabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    // For now, keep user management in memory since we don't have auth yet
+    // For now, keep user management in memory since we're using Clerk
     return undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    // For now, keep user management in memory since we don't have auth yet
+    // For now, keep user management in memory since we're using Clerk
     return undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    // For now, keep user management in memory since we don't have auth yet
-    throw new Error("User management not implemented with Supabase yet");
+    // For now, keep user management in memory since we're using Clerk
+    throw new Error("User management handled by Clerk");
   }
 
   async getConversation(id: string): Promise<ConversationState | undefined> {
@@ -55,6 +55,7 @@ export class SupabaseStorage implements IStorage {
         initialDescription: data.initial_description,
         selectedModel: data.selected_model as any,
         conversationHistory: data.conversation_history || [],
+        userId: data.user_id,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
       };
@@ -75,6 +76,7 @@ export class SupabaseStorage implements IStorage {
           initial_description: conversation.initialDescription,
           selected_model: conversation.selectedModel,
           conversation_history: conversation.conversationHistory || [],
+          user_id: conversation.userId,
           updated_at: new Date().toISOString(),
         })
         .select()
@@ -89,6 +91,7 @@ export class SupabaseStorage implements IStorage {
         initialDescription: data.initial_description,
         selectedModel: data.selected_model as any,
         conversationHistory: data.conversation_history || [],
+        userId: data.user_id,
         createdAt: new Date(data.created_at),
         updatedAt: new Date(data.updated_at),
       };
@@ -98,12 +101,19 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
-  async getAllConversations(): Promise<ConversationState[]> {
+  async getAllConversations(userId?: string): Promise<ConversationState[]> {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('conversations')
         .select('*')
         .order('updated_at', { ascending: false });
+
+      // Filter by user if provided
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -114,6 +124,7 @@ export class SupabaseStorage implements IStorage {
         initialDescription: item.initial_description,
         selectedModel: item.selected_model as any,
         conversationHistory: item.conversation_history || [],
+        userId: item.user_id,
         createdAt: new Date(item.created_at),
         updatedAt: new Date(item.updated_at),
       }));
@@ -145,6 +156,7 @@ export class SupabaseStorage implements IStorage {
         .insert({
           title: insertDocument.title,
           content: insertDocument.content || "",
+          user_id: insertDocument.userId,
         })
         .select()
         .single();
@@ -195,12 +207,19 @@ export class SupabaseStorage implements IStorage {
     }
   }
 
-  async getAllDocuments(): Promise<Document[]> {
+  async getAllDocuments(userId?: string): Promise<Document[]> {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('documents')
         .select('*')
         .order('updated_at', { ascending: false });
+
+      // Filter by user if provided
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -310,24 +329,30 @@ export class MemStorage implements IStorage {
     return conversation;
   }
 
-  async getAllConversations(): Promise<ConversationState[]> {
-    return Array.from(this.conversations.values())
-      .sort((a, b) => {
-        // Sort by most recent activity (last message timestamp)
-        const aLastMessage = a.conversationHistory?.[a.conversationHistory.length - 1];
-        const bLastMessage = b.conversationHistory?.[b.conversationHistory.length - 1];
-        
-        if (!aLastMessage && !bLastMessage) return 0;
-        if (!aLastMessage) return 1;
-        if (!bLastMessage) return -1;
-        
-        // For now, we'll use the conversation ID timestamp as a proxy
-        // In a real app, you'd have proper timestamps
-        const aTime = parseInt(a.id.split('_')[1]) || 0;
-        const bTime = parseInt(b.id.split('_')[1]) || 0;
-        
-        return bTime - aTime; // Most recent first
-      });
+  async getAllConversations(userId?: string): Promise<ConversationState[]> {
+    let conversations = Array.from(this.conversations.values());
+    
+    // Filter by user if provided
+    if (userId) {
+      conversations = conversations.filter(conv => conv.userId === userId);
+    }
+    
+    return conversations.sort((a, b) => {
+      // Sort by most recent activity (last message timestamp)
+      const aLastMessage = a.conversationHistory?.[a.conversationHistory.length - 1];
+      const bLastMessage = b.conversationHistory?.[b.conversationHistory.length - 1];
+      
+      if (!aLastMessage && !bLastMessage) return 0;
+      if (!aLastMessage) return 1;
+      if (!bLastMessage) return -1;
+      
+      // For now, we'll use the conversation ID timestamp as a proxy
+      // In a real app, you'd have proper timestamps
+      const aTime = parseInt(a.id.split('_')[1]) || 0;
+      const bTime = parseInt(b.id.split('_')[1]) || 0;
+      
+      return bTime - aTime; // Most recent first
+    });
   }
 
   async deleteConversation(id: string): Promise<boolean> {
@@ -341,7 +366,7 @@ export class MemStorage implements IStorage {
       id: id.toString(),
       title: insertDocument.title,
       content: insertDocument.content || "",
-      userId: null, // For now, no user association in memory storage
+      userId: insertDocument.userId || null,
       createdAt: now,
       updatedAt: now,
     };
@@ -353,9 +378,15 @@ export class MemStorage implements IStorage {
     return this.documents.get(id);
   }
 
-  async getAllDocuments(): Promise<Document[]> {
-    return Array.from(this.documents.values())
-      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()); // Most recently updated first
+  async getAllDocuments(userId?: string): Promise<Document[]> {
+    let documents = Array.from(this.documents.values());
+    
+    // Filter by user if provided
+    if (userId) {
+      documents = documents.filter(doc => doc.userId === userId);
+    }
+    
+    return documents.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()); // Most recently updated first
   }
 
   async updateDocument(id: string, updates: Partial<InsertDocument>): Promise<Document | undefined> {
