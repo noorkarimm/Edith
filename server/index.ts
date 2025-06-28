@@ -1,8 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { supabaseAuth } from "./middleware/auth";
 
 const app = express();
+
+// Apply Supabase auth middleware first
+app.use(supabaseAuth);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
