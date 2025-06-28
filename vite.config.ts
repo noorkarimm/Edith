@@ -35,6 +35,8 @@ export default defineConfig({
       strict: false,
       allow: [
         path.resolve(__dirname),
+        path.resolve(__dirname, "client"),
+        path.resolve(__dirname, "shared"),
       ],
     },
     hmr: false,

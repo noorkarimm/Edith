@@ -25,7 +25,7 @@ export async function setupVite(app: Express, server: Server) {
   const vite = await createViteServer({
     server: { middlewareMode: true },
     appType: 'custom',
-    root: path.resolve(__dirname, '..'),
+    root: path.resolve(__dirname, '..', 'client'), // Set root to client directory
     customLogger: {
       ...viteLogger,
       error: (msg, options) => {
@@ -40,6 +40,7 @@ export async function setupVite(app: Express, server: Server) {
     const url = req.originalUrl;
 
     try {
+      // Look for index.html in the client directory
       const clientTemplate = path.resolve(__dirname, "..", "client", "index.html");
       
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
