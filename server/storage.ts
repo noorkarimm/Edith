@@ -18,18 +18,18 @@ export interface IStorage {
 
 export class SupabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    // For now, keep user management in memory since we're using Clerk
+    // For now, keep user management in memory since we're using Supabase Auth
     return undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    // For now, keep user management in memory since we're using Clerk
+    // For now, keep user management in memory since we're using Supabase Auth
     return undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    // For now, keep user management in memory since we're using Clerk
-    throw new Error("User management handled by Clerk");
+    // For now, keep user management in memory since we're using Supabase Auth
+    throw new Error("User management handled by Supabase Auth");
   }
 
   async getConversation(id: string): Promise<ConversationState | undefined> {

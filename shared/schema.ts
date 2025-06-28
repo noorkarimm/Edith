@@ -15,7 +15,7 @@ export const conversations = pgTable("conversations", {
   initialDescription: text("initial_description").notNull(),
   selectedModel: text("selected_model").default("gpt-4o"),
   conversationHistory: jsonb("conversation_history").default([]),
-  userId: text("user_id"), // Clerk user ID
+  userId: text("user_id"), // Supabase user ID
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -24,7 +24,7 @@ export const documents = pgTable("documents", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   content: text("content").notNull().default(""),
-  userId: text("user_id"), // Clerk user ID
+  userId: text("user_id"), // Supabase user ID
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -68,7 +68,7 @@ export const conversationState = z.object({
     content: z.string(),
     model: aiModelSchema.optional(),
   })).optional(),
-  userId: z.string().optional(), // Clerk user ID
+  userId: z.string().optional(), // Supabase user ID
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
