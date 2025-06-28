@@ -1,18 +1,31 @@
-import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
+import { clerkClient } from '@clerk/express';
+import { config } from 'dotenv';
 
-// Ensure environment variables are loaded
-const clerkPublishableKey = process.env.CLERK_PUBLISHABLE_KEY;
+config();
+
 const clerkSecretKey = process.env.CLERK_SECRET_KEY;
 
-if (!clerkPublishableKey) {
-  throw new Error('CLERK_PUBLISHABLE_KEY is missing from environment variables');
-}
-
 if (!clerkSecretKey) {
-  throw new Error('CLERK_SECRET_KEY is missing from environment variables');
+  throw new Error('Missing Clerk Secret Key. Please set CLERK_SECRET_KEY in your environment variables');
 }
 
-export const clerkMiddleware = ClerkExpressWithAuth({
-  publishableKey: clerkPublishableKey,
+// Initialize Clerk client for server-side operations
+export const clerk = clerkClient({
   secretKey: clerkSecretKey,
 });
+
+export async function getUserFromClerkId(clerkUserId: string) {
+  try {
+    const user = await clerk.users.getUser(clerkUserId);
+    return {
+      id: user.id,
+      email: user.emailAddresses[0]?.emailAddress,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      imageUrl: user.imageUrl,
+    };
+  } catch (error) {
+    console.error('Error fetching user from Clerk:', error);
+    return null;
+  }
+}
