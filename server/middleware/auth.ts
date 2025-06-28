@@ -11,9 +11,10 @@ if (!publishableKey) {
   throw new Error('Missing Clerk Publishable Key. Please set VITE_CLERK_PUBLISHABLE_KEY in your environment variables');
 }
 
-// Clerk middleware for all routes with explicit publishable key
+// Clerk middleware for all routes with explicit publishable key and API routes configuration
 export const clerkAuth = clerkMiddleware({
-  publishableKey: publishableKey
+  publishableKey: publishableKey,
+  apiRoutes: ['/api(.*)'] // This ensures API routes return JSON errors instead of HTML
 });
 
 // Middleware to require authentication with JSON error responses
