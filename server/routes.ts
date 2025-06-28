@@ -12,16 +12,6 @@ const superPromptSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Add a simple test route
-  app.get("/api/test", (req, res) => {
-    res.json({ 
-      success: true, 
-      message: "API is working",
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development'
-    });
-  });
-
   // Craft Super Prompt endpoint - requires auth
   app.post("/api/craft-super-prompt", requireAuthentication, async (req, res) => {
     try {

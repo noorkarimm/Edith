@@ -170,9 +170,7 @@ function TypewriterMessage({ message }: { message: ChatMessage }) {
 }
 
 function ChatMessages({ messages }: { messages: ChatMessage[] }) {
-  // Check if Clerk is available
-  const hasClerkKey = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-  const { user } = hasClerkKey ? useUser() : { user: null };
+  const { user } = useUser();
   
   const getModelDisplayName = (model?: AIModel) => {
     switch (model) {
@@ -193,7 +191,7 @@ function ChatMessages({ messages }: { messages: ChatMessage[] }) {
       case 'gpt-4.1-mini':
         return 'GPT-4.1 Mini';
       default:
-        return model;
+        return 'AI';
     }
   };
 
@@ -204,7 +202,7 @@ function ChatMessages({ messages }: { messages: ChatMessage[] }) {
           {message.role === 'user' ? (
             <div className="flex items-start space-x-3 flex-row-reverse space-x-reverse">
               <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border bg-primary/30 border-primary/40 overflow-hidden">
-                {hasClerkKey && user?.imageUrl ? (
+                {user?.imageUrl ? (
                   <img 
                     src={user.imageUrl} 
                     alt={user.firstName || 'User'} 
@@ -280,10 +278,7 @@ function ChatMessages({ messages }: { messages: ChatMessage[] }) {
 }
 
 export default function Home() {
-  // Check if Clerk is available
-  const hasClerkKey = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-  const { user } = hasClerkKey ? useUser() : { user: null };
-  
+  const { user } = useUser();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState<AIModel>('gpt-4o');
@@ -420,21 +415,19 @@ export default function Home() {
                 </Button>
               )}
               
-              {hasClerkKey && (
-                <SignedIn>
-                  <UserButton 
-                    appearance={{
-                      elements: {
-                        avatarBox: "w-8 h-8",
-                        userButtonPopoverCard: "bg-white/95 backdrop-blur-md border border-white/30",
-                        userButtonPopoverActionButton: "hover:bg-black/5",
-                        userButtonPopoverActionButtonText: "text-black",
-                        userButtonPopoverFooter: "hidden"
-                      }
-                    }}
-                  />
-                </SignedIn>
-              )}
+              <SignedIn>
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8",
+                      userButtonPopoverCard: "bg-white/95 backdrop-blur-md border border-white/30",
+                      userButtonPopoverActionButton: "hover:bg-black/5",
+                      userButtonPopoverActionButtonText: "text-black",
+                      userButtonPopoverFooter: "hidden"
+                    }
+                  }}
+                />
+              </SignedIn>
             </div>
           </div>
         </div>
@@ -483,7 +476,7 @@ export default function Home() {
             {/* Welcome Message */}
             <div className="text-center mb-8">
               <h2 className="text-4xl font-bold text-black mb-4">
-                Welcome back, {hasClerkKey && user?.firstName ? user.firstName : 'there'}!
+                Welcome back, {user?.firstName || 'there'}!
               </h2>
               <p className="text-xl text-black/70">
                 What would you like to explore today?

@@ -6,52 +6,24 @@ config();
 
 // Get the publishable key with VITE_ prefix for backend use
 const publishableKey = process.env.VITE_CLERK_PUBLISHABLE_KEY;
-const secretKey = process.env.CLERK_SECRET_KEY;
 
-// Check if Clerk is properly configured
-const isClerkConfigured = !!(publishableKey && secretKey && publishableKey.startsWith('pk_'));
-
-if (!isClerkConfigured) {
-  console.warn('Clerk is not properly configured. Authentication will be disabled.');
-  console.warn('Required environment variables:');
-  console.warn('- VITE_CLERK_PUBLISHABLE_KEY (should start with pk_)');
-  console.warn('- CLERK_SECRET_KEY (should start with sk_)');
+if (!publishableKey) {
+  throw new Error('Missing Clerk Publishable Key. Please set VITE_CLERK_PUBLISHABLE_KEY in your environment variables');
 }
 
 // Clerk middleware for all routes with explicit publishable key and API routes configuration
-export const clerkAuth = isClerkConfigured ? clerkMiddleware({
-  publishableKey: publishableKey!,
-  secretKey: secretKey!,
-  apiRoutes: ['/api(.*)'], // This ensures API routes return JSON errors instead of HTML
-  // Add additional configuration to prevent redirect loops
-  afterAuth: (auth, req, res) => {
-    // For API routes, don't redirect on auth failure
-    if (req.path.startsWith('/api/')) {
-      return;
-    }
-  }
-}) : (req: Request, res: Response, next: NextFunction) => {
-  // Mock auth object when Clerk is not configured
-  req.auth = { userId: 'anonymous' };
-  next();
-};
+export const clerkAuth = clerkMiddleware({
+  publishableKey: publishableKey,
+  apiRoutes: ['/api(.*)'] // This ensures API routes return JSON errors instead of HTML
+});
 
 // Middleware to require authentication with JSON error responses
 export const requireAuthentication = (req: Request, res: Response, next: NextFunction) => {
-  // If Clerk is not configured, allow all requests with anonymous user
-  if (!isClerkConfigured) {
-    req.auth = { userId: 'anonymous' };
-    return next();
-  }
-
   // Check if this is an API route
   const isApiRoute = req.path.startsWith('/api/');
   
   try {
-    requireAuth({
-      // Don't redirect for API routes
-      redirectUrl: isApiRoute ? undefined : '/auth'
-    })(req, res, (error) => {
+    requireAuth()(req, res, (error) => {
       if (error || !req.auth?.userId) {
         // For API routes, return JSON error instead of redirecting
         if (isApiRoute) {
