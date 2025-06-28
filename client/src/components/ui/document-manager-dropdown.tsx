@@ -101,7 +101,7 @@ const GitHubButton: React.FC<{
     "relative",
     "transition-[background-color]",
     "duration-200",
-    "ease-[cubic-bezier(0.3,0,0.5,1)]",
+    "ease-&lsqb;cubic-bezier(0.3,0,0.5,1)&rsqb;",
     "select-none",
     "align-middle",
     "whitespace-nowrap",
