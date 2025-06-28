@@ -1,35 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
-import { clerkMiddleware } from '@clerk/express';
-import { config } from 'dotenv';
+import { clerkMiddleware, requireAuth } from '@clerk/express';
 
-config();
-
-// Clerk middleware for all routes - automatically uses CLERK_SECRET_KEY from environment
+// Clerk middleware for all routes
 export const clerkAuth = clerkMiddleware();
 
 // Middleware to require authentication with JSON error responses
-export const requireAuthentication = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // Check if user is authenticated via Clerk
-    if (!req.auth?.userId) {
-      return res.status(401).json({
-        success: false,
-        error: 'Authentication required. Please sign in to continue.',
-        code: 'UNAUTHORIZED'
-      });
-    }
-    
-    // User is authenticated, proceed
-    next();
-  } catch (error) {
+export const requireAuthentication = requireAuth({
+  onError: (error) => {
     console.error('Authentication error:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Authentication service error',
-      code: 'AUTH_ERROR'
-    });
+    return {
+      status: 401,
+      message: 'Authentication required. Please sign in to continue.'
+    };
   }
-};
+});
 
 // Middleware to get user info (optional auth)
 export const getUser = (req: Request, res: Response, next: NextFunction) => {
