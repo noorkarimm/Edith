@@ -66,8 +66,17 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
     setLoading(true);
     setError(null);
     try {
+      console.log('Fetching conversations...');
       const response = await apiRequest("GET", "/api/conversations");
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API response not ok:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
       const data = await response.json();
+      console.log('API response:', data);
       
       if (data.success) {
         // Transform the data to match our interface
@@ -95,8 +104,8 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
         setError(data.error || "Failed to load conversations");
       }
     } catch (err) {
-      setError("Failed to load conversations");
       console.error("Error fetching conversations:", err);
+      setError(err instanceof Error ? err.message : "Failed to load conversations");
     } finally {
       setLoading(false);
     }
@@ -188,10 +197,10 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
             </div>
           ) : error ? (
             <div className="p-6 text-center">
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-sm text-red-600 mb-2">{error}</p>
               <button 
                 onClick={fetchConversations}
-                className="mt-2 text-xs text-black/60 hover:text-black underline"
+                className="text-xs text-black/60 hover:text-black underline"
               >
                 Try again
               </button>
@@ -253,7 +262,7 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
             </p>
           </div>
         )}
-      </motion.div>
+      </div>
     </>
   );
 };

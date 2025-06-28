@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { clerkMiddleware, requireAuth } from '@clerk/express';
+import { clerkMiddleware } from '@clerk/express';
 import { config } from 'dotenv';
 
 config();
@@ -11,35 +11,33 @@ if (!publishableKey) {
   throw new Error('Missing Clerk Publishable Key. Please set VITE_CLERK_PUBLISHABLE_KEY in your environment variables');
 }
 
-// Clerk middleware for all routes with explicit publishable key and API routes configuration
+// Clerk middleware for all routes
 export const clerkAuth = clerkMiddleware({
   publishableKey: publishableKey,
 });
 
 // Middleware to require authentication with JSON error responses
 export const requireAuthentication = (req: Request, res: Response, next: NextFunction) => {
-  // Check if this is an API route
-  const isApiRoute = req.path.startsWith('/api/');
-  
-  // First check if user is authenticated via Clerk
-  if (!req.auth?.userId) {
-    if (isApiRoute) {
+  try {
+    // Check if user is authenticated via Clerk
+    if (!req.auth?.userId) {
       return res.status(401).json({
         success: false,
-        error: 'Authentication required',
+        error: 'Authentication required. Please sign in to continue.',
         code: 'UNAUTHORIZED'
       });
     }
-    // For non-API routes, let the default behavior handle it
-    return res.status(401).json({
+    
+    // User is authenticated, proceed
+    next();
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return res.status(500).json({
       success: false,
-      error: 'Authentication required',
-      code: 'UNAUTHORIZED'
+      error: 'Authentication service error',
+      code: 'AUTH_ERROR'
     });
   }
-  
-  // User is authenticated, proceed
-  next();
 };
 
 // Middleware to get user info (optional auth)

@@ -12,6 +12,11 @@ const superPromptSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint (no auth required)
+  app.get("/api/health", (req, res) => {
+    res.json({ success: true, message: "API is working" });
+  });
+
   // Craft Super Prompt endpoint - requires auth
   app.post("/api/craft-super-prompt", requireAuthentication, async (req, res) => {
     try {
@@ -128,7 +133,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/conversations", requireAuthentication, async (req, res) => {
     try {
       const userId = req.auth?.userId;
+      console.log('Fetching conversations for user:', userId);
+      
       const conversations = await storage.getAllConversations(userId);
+      console.log('Found conversations:', conversations.length);
       
       res.json({
         success: true,
@@ -199,7 +207,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/documents", requireAuthentication, async (req, res) => {
     try {
       const userId = req.auth?.userId;
+      console.log('Fetching documents for user:', userId);
+      
       const documents = await storage.getAllDocuments(userId);
+      console.log('Found documents:', documents.length);
       
       res.json({
         success: true,
