@@ -14,8 +14,8 @@ export default function AuthPage() {
         <h1 className="text-3xl font-bold text-black">EDITH</h1>
       </div>
 
-      {/* Auth Container */}
-      <div className="w-full max-w-md">
+      {/* Auth Container - Made wider */}
+      <div className="w-full max-w-lg">
         <div className="bg-white/95 backdrop-blur-md rounded-xl border border-white/30 p-8">
           {isSignUp ? (
             <div className="space-y-6">
