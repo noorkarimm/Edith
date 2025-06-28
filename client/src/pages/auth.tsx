@@ -36,7 +36,11 @@ export default function AuthPage() {
                       "border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors",
                     formFieldInput: 
                       "border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-black focus:border-black",
-                    footerActionLink: "text-black hover:text-gray-700"
+                    footerActionLink: "text-black hover:text-gray-700",
+                    footer: "shadow-none",
+                    footerAction: "shadow-none",
+                    footerActionText: "shadow-none",
+                    footerPages: "shadow-none"
                   }
                 }}
                 redirectUrl="/"
@@ -70,7 +74,11 @@ export default function AuthPage() {
                       "border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors",
                     formFieldInput: 
                       "border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-black focus:border-black",
-                    footerActionLink: "text-black hover:text-gray-700"
+                    footerActionLink: "text-black hover:text-gray-700",
+                    footer: "shadow-none",
+                    footerAction: "shadow-none",
+                    footerActionText: "shadow-none",
+                    footerPages: "shadow-none"
                   }
                 }}
                 redirectUrl="/"
