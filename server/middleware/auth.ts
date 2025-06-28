@@ -6,19 +6,33 @@ config();
 
 // Get the publishable key with VITE_ prefix for backend use
 const publishableKey = process.env.VITE_CLERK_PUBLISHABLE_KEY;
+const secretKey = process.env.CLERK_SECRET_KEY;
 
-if (!publishableKey) {
-  throw new Error('Missing Clerk Publishable Key. Please set VITE_CLERK_PUBLISHABLE_KEY in your environment variables');
+// Check if Clerk is properly configured
+const isClerkConfigured = !!(publishableKey && secretKey);
+
+if (!isClerkConfigured) {
+  console.warn('Clerk is not properly configured. Authentication will be disabled.');
 }
 
 // Clerk middleware for all routes with explicit publishable key and API routes configuration
-export const clerkAuth = clerkMiddleware({
-  publishableKey: publishableKey,
+export const clerkAuth = isClerkConfigured ? clerkMiddleware({
+  publishableKey: publishableKey!,
   apiRoutes: ['/api(.*)'] // This ensures API routes return JSON errors instead of HTML
-});
+}) : (req: Request, res: Response, next: NextFunction) => {
+  // Mock auth object when Clerk is not configured
+  req.auth = { userId: 'anonymous' };
+  next();
+};
 
 // Middleware to require authentication with JSON error responses
 export const requireAuthentication = (req: Request, res: Response, next: NextFunction) => {
+  // If Clerk is not configured, allow all requests with anonymous user
+  if (!isClerkConfigured) {
+    req.auth = { userId: 'anonymous' };
+    return next();
+  }
+
   // Check if this is an API route
   const isApiRoute = req.path.startsWith('/api/');
   
