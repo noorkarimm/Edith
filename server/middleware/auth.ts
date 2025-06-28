@@ -4,17 +4,8 @@ import { config } from 'dotenv';
 
 config();
 
-// Get the publishable key with VITE_ prefix for backend use
-const publishableKey = process.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-if (!publishableKey) {
-  throw new Error('Missing Clerk Publishable Key. Please set VITE_CLERK_PUBLISHABLE_KEY in your environment variables');
-}
-
-// Clerk middleware for all routes
-export const clerkAuth = clerkMiddleware({
-  publishableKey: publishableKey,
-});
+// Clerk middleware for all routes - automatically uses CLERK_SECRET_KEY from environment
+export const clerkAuth = clerkMiddleware();
 
 // Middleware to require authentication with JSON error responses
 export const requireAuthentication = (req: Request, res: Response, next: NextFunction) => {
