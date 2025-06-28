@@ -262,7 +262,7 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
             </p>
           </div>
         )}
-      </div>
+      </motion.div>
     </>
   );
 };
