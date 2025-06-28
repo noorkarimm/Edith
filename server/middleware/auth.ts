@@ -14,7 +14,8 @@ if (!publishableKey) {
 // Clerk middleware for all routes with explicit publishable key and API routes configuration
 export const clerkAuth = clerkMiddleware({
   publishableKey: publishableKey,
-  apiRoutes: ['/api(.*)'] // This ensures API routes return JSON errors instead of HTML
+  // Configure API routes to return JSON errors instead of HTML
+  apiRoutes: ['/api(.*)']
 });
 
 // Middleware to require authentication with JSON error responses
@@ -23,7 +24,19 @@ export const requireAuthentication = (req: Request, res: Response, next: NextFun
   const isApiRoute = req.path.startsWith('/api/');
   
   try {
-    requireAuth()(req, res, (error) => {
+    requireAuth({
+      // Add onError handler for API routes
+      onError: (error) => {
+        if (isApiRoute) {
+          return res.status(401).json({
+            success: false,
+            error: 'Authentication required',
+            code: 'UNAUTHORIZED'
+          });
+        }
+        throw error;
+      }
+    })(req, res, (error) => {
       if (error || !req.auth?.userId) {
         // For API routes, return JSON error instead of redirecting
         if (isApiRoute) {
