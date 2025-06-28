@@ -278,7 +278,7 @@ function ChatMessages({ messages }: { messages: ChatMessage[] }) {
 }
 
 export default function Home() {
-  const { user } = useUser();
+  const { user, isLoaded, isSignedIn } = useUser();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState<AIModel>('gpt-4o');
@@ -459,6 +459,8 @@ export default function Home() {
         isOpen={showConversationHistory}
         onClose={() => setShowConversationHistory(false)}
         onSelectConversation={handleSelectConversation}
+        isUserLoaded={isLoaded}
+        isUserSignedIn={isSignedIn}
       />
 
       {/* Document Manager Dropdown */}
@@ -466,6 +468,8 @@ export default function Home() {
         isOpen={showDocumentManager}
         onClose={() => setShowDocumentManager(false)}
         onSelectDocument={handleSelectDocument}
+        isUserLoaded={isLoaded}
+        isUserSignedIn={isSignedIn}
       />
 
       {/* Main Content with top padding to account for fixed header */}

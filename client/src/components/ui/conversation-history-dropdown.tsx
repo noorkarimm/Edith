@@ -17,6 +17,8 @@ interface ConversationHistoryDropdownProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectConversation: (conversationId: string) => void;
+  isUserLoaded: boolean;
+  isUserSignedIn: boolean | undefined;
   className?: string;
 }
 
@@ -24,6 +26,8 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
   isOpen,
   onClose,
   onSelectConversation,
+  isUserLoaded,
+  isUserSignedIn,
   className
 }) => {
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
@@ -31,14 +35,14 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isUserLoaded && isUserSignedIn) {
       fetchConversations();
     }
-  }, [isOpen]);
+  }, [isOpen, isUserLoaded, isUserSignedIn]);
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !isUserLoaded || !isUserSignedIn) return;
 
     const channel = supabase
       .channel('conversations-changes')
@@ -60,7 +64,7 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isOpen]);
+  }, [isOpen, isUserLoaded, isUserSignedIn]);
 
   const fetchConversations = async () => {
     setLoading(true);
@@ -190,7 +194,17 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
 
         {/* Content */}
         <div className="max-h-80 overflow-y-auto">
-          {loading ? (
+          {!isUserLoaded ? (
+            <div className="p-6 text-center">
+              <div className="animate-spin w-6 h-6 border-2 border-black/20 border-t-black rounded-full mx-auto mb-2"></div>
+              <p className="text-sm text-black/60">Loading user session...</p>
+            </div>
+          ) : !isUserSignedIn ? (
+            <div className="p-6 text-center">
+              <MessageCircle className="w-8 h-8 text-black/30 mx-auto mb-2" />
+              <p className="text-sm text-black/60">Please sign in to view conversations</p>
+            </div>
+          ) : loading ? (
             <div className="p-6 text-center">
               <div className="animate-spin w-6 h-6 border-2 border-black/20 border-t-black rounded-full mx-auto mb-2"></div>
               <p className="text-sm text-black/60">Loading conversations...</p>

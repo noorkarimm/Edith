@@ -18,6 +18,8 @@ interface DocumentManagerDropdownProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectDocument: (documentId: string) => void;
+  isUserLoaded: boolean;
+  isUserSignedIn: boolean | undefined;
   className?: string;
 }
 
@@ -161,6 +163,8 @@ export const DocumentManagerDropdown: React.FC<DocumentManagerDropdownProps> = (
   isOpen,
   onClose,
   onSelectDocument,
+  isUserLoaded,
+  isUserSignedIn,
   className
 }) => {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -169,14 +173,14 @@ export const DocumentManagerDropdown: React.FC<DocumentManagerDropdownProps> = (
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isUserLoaded && isUserSignedIn) {
       fetchDocuments();
     }
-  }, [isOpen]);
+  }, [isOpen, isUserLoaded, isUserSignedIn]);
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !isUserLoaded || !isUserSignedIn) return;
 
     const channel = supabase
       .channel('documents-changes')
@@ -198,7 +202,7 @@ export const DocumentManagerDropdown: React.FC<DocumentManagerDropdownProps> = (
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isOpen]);
+  }, [isOpen, isUserLoaded, isUserSignedIn]);
 
   const fetchDocuments = async () => {
     setLoading(true);
@@ -341,6 +345,7 @@ export const DocumentManagerDropdown: React.FC<DocumentManagerDropdownProps> = (
               onClick={handleCreateClick}
               variant="secondary"
               className="flex items-center space-x-1.5 !px-3 !py-1.5 !text-sm"
+              disabled={!isUserLoaded || !isUserSignedIn}
             >
               <Plus className="w-4 h-4" />
               <span>New</span>
@@ -359,7 +364,17 @@ export const DocumentManagerDropdown: React.FC<DocumentManagerDropdownProps> = (
 
         {/* Content */}
         <div className="max-h-96 overflow-y-auto">
-          {loading ? (
+          {!isUserLoaded ? (
+            <div className="p-6 text-center">
+              <div className="animate-spin w-6 h-6 border-2 border-black/20 border-t-black rounded-full mx-auto mb-2"></div>
+              <p className="text-sm text-black/60">Loading user session...</p>
+            </div>
+          ) : !isUserSignedIn ? (
+            <div className="p-6 text-center">
+              <DocumentIcon size={32} className="text-black/30 mx-auto mb-2" />
+              <p className="text-sm text-black/60">Please sign in to view documents</p>
+            </div>
+          ) : loading ? (
             <div className="p-6 text-center">
               <div className="animate-spin w-6 h-6 border-2 border-black/20 border-t-black rounded-full mx-auto mb-2"></div>
               <p className="text-sm text-black/60">Loading documents...</p>
