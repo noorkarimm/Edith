@@ -33,9 +33,7 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
-    hmr: {
-      port: 24678,
-    },
+    hmr: false, // Disable HMR completely to avoid WebSocket issues
     host: "0.0.0.0",
     port: 5173,
   },
