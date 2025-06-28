@@ -110,13 +110,6 @@ export default function AuthPage() {
           )}
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="mt-8 text-center">
-        <p className="text-white/60 text-sm">
-          Your intelligent assistant powered by AI
-        </p>
-      </div>
     </div>
   );
 }
