@@ -7,7 +7,8 @@ import { AnimatedEmailIcon } from "@/components/ui/animated-email-icon";
 import { AnimatedPlusIcon } from "@/components/ui/animated-plus-icon";
 import { ConversationHistoryDropdown } from "@/components/ui/conversation-history-dropdown";
 import { DocumentManagerDropdown } from "@/components/ui/document-manager-dropdown";
-import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
+import { UserButton } from "@/components/ui/user-button";
+import { useAuth } from "@/components/AuthProvider";
 import { apiRequest } from "@/lib/queryClient";
 import { User } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
@@ -170,7 +171,7 @@ function TypewriterMessage({ message }: { message: ChatMessage }) {
 }
 
 function ChatMessages({ messages }: { messages: ChatMessage[] }) {
-  const { user } = useUser();
+  const { user } = useAuth();
   
   const getModelDisplayName = (model?: AIModel) => {
     switch (model) {
@@ -195,22 +196,22 @@ function ChatMessages({ messages }: { messages: ChatMessage[] }) {
     }
   };
 
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'User';
+  const userInitials = userName
+    .split(' ')
+    .map(name => name.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
     <div className="space-y-8">
       {messages.map((message, index) => (
         <div key={index}>
           {message.role === 'user' ? (
             <div className="flex items-start space-x-3 flex-row-reverse space-x-reverse">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border bg-primary/30 border-primary/40 overflow-hidden">
-                {user?.imageUrl ? (
-                  <img 
-                    src={user.imageUrl} 
-                    alt={user.firstName || 'User'} 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-4 h-4 text-primary" />
-                )}
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border bg-primary/30 border-primary/40 text-primary font-medium text-sm">
+                {userInitials}
               </div>
               <div className="max-w-[85%] p-4 rounded-2xl border shadow-lg bg-primary/20 text-black rounded-tr-md border-primary/30">
                 <div className="text-sm whitespace-pre-wrap leading-relaxed font-medium break-words">
@@ -278,7 +279,7 @@ function ChatMessages({ messages }: { messages: ChatMessage[] }) {
 }
 
 export default function Home() {
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { user, loading: authLoading } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState<AIModel>('gpt-4o');
@@ -390,6 +391,19 @@ export default function Home() {
   const isLoading = chatMutation.isPending;
   const error = chatMutation.error;
 
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'there';
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)] flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-8 h-8 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+          <p className="text-black/80">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[radial-gradient(125%_125%_at_50%_101%,rgba(245,87,2,1)_10.5%,rgba(245,120,2,1)_16%,rgba(245,140,2,1)_17.5%,rgba(245,170,100,1)_25%,rgba(238,174,202,1)_40%,rgba(202,179,214,1)_65%,rgba(148,201,233,1)_100%)] flex flex-col relative">
       {/* Fixed Transparent Header */}
@@ -415,19 +429,7 @@ export default function Home() {
                 </Button>
               )}
               
-              <SignedIn>
-                <UserButton 
-                  appearance={{
-                    elements: {
-                      avatarBox: "w-8 h-8",
-                      userButtonPopoverCard: "bg-white/95 backdrop-blur-md border border-white/30",
-                      userButtonPopoverActionButton: "hover:bg-black/5",
-                      userButtonPopoverActionButtonText: "text-black",
-                      userButtonPopoverFooter: "hidden"
-                    }
-                  }}
-                />
-              </SignedIn>
+              <UserButton />
             </div>
           </div>
         </div>
@@ -459,8 +461,8 @@ export default function Home() {
         isOpen={showConversationHistory}
         onClose={() => setShowConversationHistory(false)}
         onSelectConversation={handleSelectConversation}
-        isUserLoaded={isLoaded}
-        isUserSignedIn={isSignedIn}
+        isUserLoaded={!authLoading}
+        isUserSignedIn={!!user}
       />
 
       {/* Document Manager Dropdown */}
@@ -468,8 +470,8 @@ export default function Home() {
         isOpen={showDocumentManager}
         onClose={() => setShowDocumentManager(false)}
         onSelectDocument={handleSelectDocument}
-        isUserLoaded={isLoaded}
-        isUserSignedIn={isSignedIn}
+        isUserLoaded={!authLoading}
+        isUserSignedIn={!!user}
       />
 
       {/* Main Content with top padding to account for fixed header */}
@@ -480,7 +482,7 @@ export default function Home() {
             {/* Welcome Message */}
             <div className="text-center mb-8">
               <h2 className="text-4xl font-bold text-black mb-4">
-                Welcome back, {user?.firstName || 'there'}!
+                Welcome back, {userName}!
               </h2>
               <p className="text-xl text-black/70">
                 What would you like to explore today?
