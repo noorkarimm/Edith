@@ -52,6 +52,8 @@
     "clsx": "^2.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.29.3",
+    "drizzle-zod": "^0.5.1",
     "express": "^4.18.2",
     "lucide-react": "^0.344.0",
     "openai": "^4.28.0",
