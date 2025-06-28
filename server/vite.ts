@@ -25,8 +25,7 @@ export async function setupVite(app: Express, server: Server) {
   const vite = await createViteServer({
     server: { middlewareMode: true },
     appType: 'custom',
-    root: path.resolve(__dirname, '../client'),
-    configFile: false,
+    root: path.resolve(__dirname, '..'),
     customLogger: {
       ...viteLogger,
       error: (msg, options) => {
