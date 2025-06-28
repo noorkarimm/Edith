@@ -93,15 +93,6 @@ export default function AuthPage() {
                   redirectUrl="/"
                 />
               </div>
-              
-              <div className="text-center">
-                <button
-                  onClick={() => setIsSignUp(true)}
-                  className="text-black hover:text-black/80 font-medium"
-                >
-                  Don't have an account? Sign up
-                </button>
-              </div>
             </div>
           )}
         </div>
