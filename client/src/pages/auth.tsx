@@ -16,7 +16,7 @@ export default function AuthPage() {
 
       {/* Auth Container */}
       <div className="w-full max-w-md">
-        <div className="bg-white/95 backdrop-blur-md rounded-xl border border-white/30 shadow-2xl p-8">
+        <div className="bg-white/95 backdrop-blur-md rounded-xl border border-white/30 p-8">
           {isSignUp ? (
             <div className="space-y-6">
               <div className="text-center">
