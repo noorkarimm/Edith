@@ -37,22 +37,19 @@ export default defineConfig({
         path.resolve(__dirname),
       ],
     },
-    hmr: false, // Disable HMR completely
-    ws: false, // Explicitly disable WebSocket server
+    hmr: false,
+    ws: false,
     host: "0.0.0.0",
     port: 5173,
-    // Force polling instead of file watching to avoid WebSocket usage
     watch: {
       usePolling: true,
       interval: 1000,
     },
   },
-  // Completely disable client-side features that might use WebSockets
   define: {
     __VITE_IS_MODERN__: false,
     __VITE_HMR__: false,
   },
-  // Ensure no WebSocket client code is injected
   optimizeDeps: {
     exclude: ['vite/client']
   }
