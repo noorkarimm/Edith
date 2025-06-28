@@ -38,23 +38,25 @@ export default function AuthPage() {
                       formFieldInput: 
                         "border border-white/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-white/50 focus:border-white/50 bg-white/10 backdrop-blur-sm text-black placeholder:text-black/60",
                       footerActionLink: "text-black hover:text-black/80",
-                      footer: "shadow-none",
-                      footerAction: "shadow-none",
-                      footerActionText: "shadow-none",
-                      footerPages: "shadow-none",
+                      footer: "hidden",
+                      footerAction: "hidden",
+                      footerActionText: "hidden",
+                      footerPages: "hidden",
                       formFieldLabel: "text-black/90",
                       identityPreviewText: "text-black/80",
                       identityPreviewEditButton: "text-black/80 hover:text-black"
                     }
                   }}
-                  redirectUrl="/"
+                  routing="hash"
+                  signInUrl="#"
+                  afterSignUpUrl="/"
                 />
               </div>
               
               <div className="text-center">
                 <button
                   onClick={() => setIsSignUp(false)}
-                  className="text-black hover:text-black/80 font-medium"
+                  className="text-black hover:text-black/80 font-medium underline"
                 >
                   Already have an account? Sign in
                 </button>
@@ -81,17 +83,28 @@ export default function AuthPage() {
                       formFieldInput: 
                         "border border-white/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-white/50 focus:border-white/50 bg-white/10 backdrop-blur-sm text-black placeholder:text-black/60",
                       footerActionLink: "text-black hover:text-black/80",
-                      footer: "shadow-none",
-                      footerAction: "shadow-none",
-                      footerActionText: "shadow-none",
-                      footerPages: "shadow-none",
+                      footer: "hidden",
+                      footerAction: "hidden",
+                      footerActionText: "hidden",
+                      footerPages: "hidden",
                       formFieldLabel: "text-black/90",
                       identityPreviewText: "text-black/80",
                       identityPreviewEditButton: "text-black/80 hover:text-black"
                     }
                   }}
-                  redirectUrl="/"
+                  routing="hash"
+                  signUpUrl="#"
+                  afterSignInUrl="/"
                 />
+              </div>
+              
+              <div className="text-center">
+                <button
+                  onClick={() => setIsSignUp(true)}
+                  className="text-black hover:text-black/80 font-medium underline"
+                >
+                  Don't have an account? Sign up
+                </button>
               </div>
             </div>
           )}
