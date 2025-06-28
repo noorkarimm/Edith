@@ -33,8 +33,17 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
-    hmr: false, // Disable HMR completely to avoid WebSocket issues
+    hmr: false, // Completely disable HMR
+    ws: false,  // Disable WebSocket server
+    watch: {
+      usePolling: true, // Use polling instead of file system events
+      interval: 1000,
+    },
     host: "0.0.0.0",
     port: 5173,
+  },
+  // Additional configuration to prevent WebSocket connections
+  define: {
+    __VITE_HMR__: false,
   },
 });
