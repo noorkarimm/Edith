@@ -1,13 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 export default defineConfig({
   plugins: [
     react(),
-    // Disable runtime error overlay as it may use WebSockets
-    // runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
@@ -46,8 +43,13 @@ export default defineConfig({
       interval: 1000,
     },
   },
-  // Disable all client-side features that might use WebSockets
+  // Completely disable client-side features that might use WebSockets
   define: {
     __VITE_IS_MODERN__: false,
+    __VITE_HMR__: false,
   },
+  // Ensure no WebSocket client code is injected
+  optimizeDeps: {
+    exclude: ['vite/client']
+  }
 });
