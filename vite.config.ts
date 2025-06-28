@@ -6,7 +6,8 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 export default defineConfig({
   plugins: [
     react(),
-    runtimeErrorOverlay(),
+    // Disable runtime error overlay as it may use WebSockets
+    // runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
@@ -30,14 +31,23 @@ export default defineConfig({
   },
   server: {
     fs: {
-      strict: false, // Allow access to files outside root
+      strict: false,
       allow: [
-        // Allow access to the entire project directory
         path.resolve(import.meta.dirname),
       ],
     },
-    hmr: false, // Disable HMR to avoid WebSocket issues
+    hmr: false, // Disable HMR completely
+    ws: false, // Explicitly disable WebSocket server
     host: "0.0.0.0",
     port: 5173,
+    // Force polling instead of file watching to avoid WebSocket usage
+    watch: {
+      usePolling: true,
+      interval: 1000,
+    },
+  },
+  // Disable all client-side features that might use WebSockets
+  define: {
+    __VITE_IS_MODERN__: false,
   },
 });
