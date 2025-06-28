@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, MessageCircle, Clock, Trash2, X } from "lucide-react";
+import { useAuth } from "@clerk/clerk-react";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import { supabase } from "@/lib/supabase";
@@ -33,6 +34,7 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { getToken } = useAuth();
 
   useEffect(() => {
     if (isOpen && isUserLoaded && isUserSignedIn) {
@@ -71,7 +73,8 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
     setError(null);
     try {
       console.log('Fetching conversations...');
-      const response = await apiRequest("GET", "/api/conversations");
+      const token = await getToken();
+      const response = await apiRequest("GET", "/api/conversations", undefined, token);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -134,7 +137,8 @@ export const ConversationHistoryDropdown: React.FC<ConversationHistoryDropdownPr
   const handleDeleteConversation = async (conversationId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const response = await apiRequest("DELETE", `/api/conversations/${conversationId}`);
+      const token = await getToken();
+      const response = await apiRequest("DELETE", `/api/conversations/${conversationId}`, undefined, token);
       const data = await response.json();
       
       if (data.success) {
